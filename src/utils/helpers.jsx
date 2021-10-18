@@ -8,10 +8,12 @@ export function onNextFrame(callback) {
     })
 }
 
-export function getNodes(number) {
-    return Array(number).fill(0).map((e, i) => (
-        <span key={i}>Span {i} </span>
-    ))
+export function getNodes(number) {    
+    return <span>
+        {Array(parseInt(number)).fill(0).map((e, i) => (
+            <span key={i}>Span1 {i} </span>
+        ))}
+  </span>
 }
 
 export function avg(args) {
@@ -21,6 +23,14 @@ export function avg(args) {
 
 export function sum(args) {
     return round(args.reduce((el, acc) => acc += el, 0));
+}
+
+export function getRandomArgs(size) {
+    const args = {};
+    for (let i = 0; i < size; i++) {
+        args[`arg-${i}`] = i;
+    }
+    return args;
 }
 
 export const benchmarkName = {

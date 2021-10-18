@@ -1,5 +1,5 @@
 import react, { useEffect, useState, useRef, Profiler } from 'react';
-import { avg, results, benchmarkName, sum } from '../utils/helpers';
+import { avg, results, benchmarkName, sum, getRandomArgs } from '../utils/helpers';
 import { Tress, TressMemo } from '../Tress/Tress';
 
 const onRenderCallback = (
@@ -22,20 +22,15 @@ const BenchUI = () => {
     // Settings
     const [treeDepth, setTreeDepth] = useState(100);
     const [renderNumber, setRenderNumber] = useState(10);
+    const [contentSize, setContentSize] = useState(0);
+    const [argumentsSize, setArgumentsSize] = useState(0);
 
     const onClickRender = () => {
         Object.keys(results).forEach(key => results[key] = []);
         setIsLoading(true)
         setRenderNodes(true)
+        setRenderCounter(0);
     };
-
-    useEffect(() => {
-        if (isLoading) {
-            setRenderCounter(0);
-            perfTimeEndRef.current = performance.now();
-            
-        }
-    }, [isLoading]);
 
     useEffect(() => {
         if (!isLoading) return
@@ -47,26 +42,39 @@ const BenchUI = () => {
             console.log(results);
             setIsLoading(false);
           }
-        });
+        }, 10);
     }, [renderCounter, isLoading, renderNumber]);
 
-    const onTreeDepthChange = ({ target }) => setTreeDepth(target.value);
-    const onRenderNumberChange = ({ target }) => setRenderNumber(target.value);
+    const onTreeDepthChange = ({ target }) => setTreeDepth(parseInt(target.value));
+    const onRenderNumberChange = ({ target }) => setRenderNumber(parseInt(target.value));
+    const onSetContentSize = ({ target }) => setContentSize(parseInt(target.value));
+    const onArgumentsNumberChange = ({ target }) => setArgumentsSize(parseInt(target.value));
+    console.log(results);
     
     return <>
         <h2>Settings</h2>
 
-        <div>
-            <label>Tree depth: {treeDepth}</label>
-            <input type="range" step="10" max="1000" onChange={onTreeDepthChange} />
-        </div>
-        <div>
-            <label>Renders : {renderNumber}</label>
-            <input type="range" step="10" max="1000" onChange={onRenderNumberChange} />
+        <div className="settings">
+            <div>
+                <label>Tree depth: {treeDepth}</label>
+                <input type="range" value={treeDepth} step="10" max="1000" onChange={onTreeDepthChange} />
+            </div>
+            <div>
+                <label>Renders : {renderNumber}</label>
+                <input type="range" value={renderNumber} step="10" max="1000" onChange={onRenderNumberChange} />
+            </div>
+            <div>
+                <label>Node content : {contentSize}</label>
+                <input type="range" value={contentSize} step="1" max="10" onChange={onSetContentSize} />
+            </div>
+            <div>
+                <label>Arguments size : {argumentsSize}</label>
+                <input type="range" value={argumentsSize} step="1" max="100" onChange={onArgumentsNumberChange} />
+            </div>
         </div>
 
         <p>Loading: {isLoading ? '⏳' : '✔️'}</p>
-        <button onClick={onClickRender}>Render</button>
+        <button onClick={onClickRender}>Render x{renderNumber}</button>
         <br />
         <table>
             <thead>
@@ -83,10 +91,10 @@ const BenchUI = () => {
 
         {renderNodes && <div key={isLoading}>
             <Profiler id={benchmarkName.bigTree} onRender={onRenderCallback}>
-                <Tress renderCounter={treeDepth} />
+                <Tress renderCounter={treeDepth} contentSize={contentSize} {...getRandomArgs(argumentsSize)} />
             </Profiler>                
             <Profiler id={benchmarkName.bigTreeMemo} onRender={onRenderCallback}>
-                <TressMemo renderCounter={treeDepth} />
+                <TressMemo renderCounter={treeDepth} contentSize={contentSize} {...getRandomArgs(argumentsSize)} />
             </Profiler>                
         </div>}
     </>;
