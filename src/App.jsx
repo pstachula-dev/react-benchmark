@@ -2,7 +2,7 @@ import { useState } from 'react'
 import logo from './logo.svg'
 import './App.css'
 
-import BenchUI from './BenchBoy/BenchBoy';
+import BenchUI from './BenchUI/BenchUI';
 
 function App() {
   const [count, setCount] = useState(0)
